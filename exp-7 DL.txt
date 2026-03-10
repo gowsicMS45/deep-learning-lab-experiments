@@ -1,0 +1,66 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from transformers import pipeline
+
+
+data = {
+    "text": [
+        "I love this product",
+        "This movie was amazing",
+        "The service was excellent",
+        "I really enjoyed the experience",
+        "The product quality is great",
+        "I hate this item",
+        "This is the worst purchase",
+        "The experience was terrible"
+    ],
+    "sentiment":[1,1,1,1,1,0,0,0]
+}
+
+df = pd.DataFrame(data)
+
+print("Dataset Preview:")
+print(df)
+
+
+classifier = pipeline("sentiment-analysis")
+
+labels=[]
+scores=[]
+
+print("\nPredictions:\n")
+
+for text in df["text"]:
+
+    result = classifier(text)[0]
+
+    print("Text:", text)
+    print("Label:", result["label"])
+    print("Score:", result["score"])
+    print()
+
+    labels.append(result["label"])
+    scores.append(result["score"])
+
+
+df["Predicted_Label"]=labels
+df["Confidence_Score"]=scores
+
+print("\nFinal Result Table:")
+print(df)
+
+
+plt.figure()
+df["Predicted_Label"].value_counts().plot(kind="bar")
+plt.title("Sentiment Classification Result")
+plt.xlabel("Sentiment")
+plt.ylabel("Count")
+plt.show()
+
+
+plt.figure()
+plt.plot(df["Confidence_Score"])
+plt.title("Prediction Confidence Score")
+plt.xlabel("Sample Index")
+plt.ylabel("Score")
+plt.show()
